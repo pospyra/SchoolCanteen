@@ -30,12 +30,20 @@ namespace SchoolCanteen.Forms.Cashier
             dataGridView2.Columns["Quantity"].ReadOnly = false;
         }
 
-        private void button2_Click(object sender, System.EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
+            // Проверяем, есть ли строки в dataGridView2
+            if (dataGridView2.Rows.Count == 1 && dataGridView2.Rows[0].IsNewRow)
+            {
+                MessageBox.Show("Заказ пустой.", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             SaveOrderDetailsToDatabase();
             cashierPanelForm.FillOrders();
             Hide();
         }
+
 
         public void FillBlydo()
         {
@@ -57,18 +65,19 @@ namespace SchoolCanteen.Forms.Cashier
         {
             int cashierID = 1;
             DateTime orderTime = DateTime.Now; // Получаем текущее время
-
+            bool isPaymentByCard = checkBox1.Checked;
             // Формируем SQL-запрос на добавление заказа в таблицу Orders
             string insertOrderQuery = @"
-                                        INSERT INTO Orders (CashierID, OrderTime)
-                                        VALUES (@CashierID, @OrderTime);
+                                        INSERT INTO Orders (CashierID, OrderTime, IsPaymentByCard)
+                                        VALUES (@CashierID, @OrderTime, @IsPaymentByCard);
                                         SELECT SCOPE_IDENTITY();"; // Получаем последний идентификатор (OrderID)
 
             // Создаем параметры для передачи значений в SQL-запрос
             SqlParameter[] parameters =
             {
                 new SqlParameter("@CashierID", cashierID),
-                new SqlParameter("@OrderTime", orderTime)
+                new SqlParameter("@OrderTime", orderTime),
+                new SqlParameter("@IsPaymentByCard", isPaymentByCard)
             };
 
             // Выполняем SQL-запрос и получаем OrderID
@@ -115,12 +124,12 @@ namespace SchoolCanteen.Forms.Cashier
                 }
 
                 // Выводим сообщение об успешном сохранении данных о блюдах в заказе
-                MessageBox.Show("Информация о блюдах в заказе успешно сохранена в базе данных.");
+                MessageBox.Show("Заказ оформлен.");
             }
             else
             {
                 // Выводим сообщение об ошибке при добавлении заказа
-                MessageBox.Show("Ошибка при добавлении заказа в базу данных.");
+                MessageBox.Show("Ошибка при добавлении заказа.");
             }
         }
 
@@ -162,6 +171,8 @@ namespace SchoolCanteen.Forms.Cashier
 
                 int newQuantity = quantity - count;
                 dataGridView1.SelectedRows[0].Cells["Quantity"].Value = newQuantity;
+
+                CalculateTotalAmount();
             }
         }
 
@@ -188,31 +199,30 @@ namespace SchoolCanteen.Forms.Cashier
             if (dataGridView2.SelectedRows.Count > 0)
             {
                 dataGridView2.Rows.RemoveAt(dataGridView2.SelectedRows[0].Index);
+                CalculateTotalAmount();
             }
+        }
+
+        private void CalculateTotalAmount()
+        {
+            decimal totalAmount = 0;
+
+            foreach (DataGridViewRow row in dataGridView2.Rows)
+            {
+                if (row.Cells["Price"].Value != null && row.Cells["Quantity"].Value != null)
+                {
+                    decimal price = Convert.ToDecimal(row.Cells["Price"].Value);
+                    int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                    totalAmount += price * quantity;
+                }
+            }
+
+            label6.Text = $"Сумма к оплате: {totalAmount} руб.";
         }
 
         private void dataGridView2_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            //// Проверяем, что изменение произошло в столбце "Quantity"
-            //if (e.ColumnIndex == dataGridView2.Columns["Quantity"].Index && e.RowIndex >= 0)
-            //{
-            //    // Получаем выбранное блюдо в dataGridView2
-            //    DataGridViewRow selectedRow = dataGridView2.Rows[e.RowIndex];
-            //    string dishId = selectedRow.Cells["DishID"].Value.ToString();
-            //    int newQuantity = Convert.ToInt32(selectedRow.Cells["Quantity"].Value);
-
-            //    // Обновляем количество оставшихся блюд в dataGridView1
-            //    foreach (DataGridViewRow row in dataGridView1.Rows)
-            //    {
-            //        if (row.Cells["DishID"].Value.ToString() == dishId)
-            //        {
-            //            int currentQuantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-            //            int totalQuantity = currentQuantity + (int.Parse(selectedRow.Cells["Quantity"].Value.ToString()) - newQuantity);
-            //            row.Cells["Quantity"].Value = totalQuantity;
-            //            break; // Выходим из цикла после обновления количества
-            //        }
-            //    }
-            //}
+            CalculateTotalAmount();
         }
     }
 }

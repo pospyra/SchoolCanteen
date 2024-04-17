@@ -8,19 +8,12 @@ namespace SchoolCanteen.Forms
 {
     public partial class MenuForm : Form
     {
-        private DatabaseManager databaseManager;
+        private readonly DatabaseManager databaseManager;
         public MenuForm()
         {
             InitializeComponent();
             databaseManager = new DatabaseManager();
             FillBlydo();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //Добавить проверку на null dataGridView1 SelectedRows
-            var productId = int.Parse(dataGridView1.SelectedRows[0].Cells[0].Value.ToString());
-            new ProductInfoForm(productId).ShowDialog();
         }
 
         public void FillBlydo()
@@ -39,6 +32,7 @@ namespace SchoolCanteen.Forms
             }
         }
 
+
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             string searchTerm = textBox1.Text;
@@ -47,8 +41,10 @@ namespace SchoolCanteen.Forms
             string query = "SELECT * FROM Dishes WHERE Name LIKE @SearchTerm";
 
             // Создаем параметр для передачи значения поиска
-            SqlParameter parameter = new SqlParameter("@SearchTerm", SqlDbType.NVarChar);
-            parameter.Value = "%" + searchTerm + "%"; // Добавляем знаки % для поиска по части имени
+            SqlParameter parameter = new SqlParameter("@SearchTerm", SqlDbType.NVarChar)
+            {
+                Value = "%" + searchTerm + "%" // Добавляем знаки % для поиска по части имени
+            };
 
             // Получаем данные из базы данных
             DataTable dt = databaseManager.GetData(query, new SqlParameter[] { parameter });

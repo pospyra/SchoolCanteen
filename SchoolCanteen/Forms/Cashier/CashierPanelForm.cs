@@ -20,12 +20,26 @@ namespace SchoolCanteen.Forms.Cashier
         {
             if (databaseManager != null)
             {
-                databaseManager.Fill("Orders", dataGridView1);
+                string query = @"
+                                 SELECT 
+                                     Orders.OrderID AS 'Номер заказа',
+                                     Users.FullName AS 'Кассир',
+                                     Orders.OrderTime AS 'Время заказа'
+                                 FROM 
+                                     Orders
+                                 INNER JOIN 
+                                     Users ON Orders.CashierID = Users.UserID";
 
-                // Замена названий столбцов на русские
-                dataGridView1.Columns["OrderID"].HeaderText = "Номер заказа";
-                dataGridView1.Columns["CashierID"].HeaderText = "ID кассира";
-                dataGridView1.Columns["OrderTime"].HeaderText = "Время заказа";
+                // Получаем данные заказов с именем кассира
+                DataTable ordersTable = databaseManager.GetData(query);
+
+                if (ordersTable != null)
+                {
+                    dataGridView1.DataSource = ordersTable;
+
+                    // Установка ширины столбца с временем заказа
+                    dataGridView1.Columns["Время заказа"].Width = 120;
+                }
             }
         }
 
@@ -58,6 +72,8 @@ namespace SchoolCanteen.Forms.Cashier
                     detailsData.Columns["Quantity"].ColumnName = "Количество";
 
                     dataGridView2.DataSource = detailsData;
+
+                    dataGridView2.Columns[1].Width = 150;
                 }
             }
         }
