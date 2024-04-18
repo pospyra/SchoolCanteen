@@ -1,6 +1,4 @@
-﻿using SchoolCanteen.Forms.Admin;
-using SchoolCanteen.Forms.Cashier;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace SchoolCanteen
@@ -15,7 +13,7 @@ namespace SchoolCanteen
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new AdminPanelForm());
+            Application.Run(new Form1());
         }
     }
 }

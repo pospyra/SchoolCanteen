@@ -57,11 +57,29 @@
     <Compile Include="Forms\Admin\AdminPanelForm.Designer.cs">
       <DependentUpon>AdminPanelForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Admin\CreateDishesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Admin\CreateDishesForm.Designer.cs">
+      <DependentUpon>CreateDishesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Admin\CreateEmployeeForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Admin\CreateEmployeeForm.Designer.cs">
       <DependentUpon>CreateEmployeeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Admin\UpdateDishesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Admin\UpdateDishesForm.Designer.cs">
+      <DependentUpon>UpdateDishesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Admin\UpdateEmployeeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Admin\UpdateEmployeeForm.Designer.cs">
+      <DependentUpon>UpdateEmployeeForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AuthForm.cs">
       <SubType>Form</SubType>
@@ -101,8 +119,17 @@
     <EmbeddedResource Include="Forms\Admin\AdminPanelForm.resx">
       <DependentUpon>AdminPanelForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Admin\CreateDishesForm.resx">
+      <DependentUpon>CreateDishesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Admin\CreateEmployeeForm.resx">
       <DependentUpon>CreateEmployeeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Admin\UpdateDishesForm.resx">
+      <DependentUpon>UpdateDishesForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Admin\UpdateEmployeeForm.resx">
+      <DependentUpon>UpdateEmployeeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AuthForm.resx">
       <DependentUpon>AuthForm.cs</DependentUpon>

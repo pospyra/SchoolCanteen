@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SchoolCanteen.Forms.Admin
@@ -15,6 +16,7 @@ namespace SchoolCanteen.Forms.Admin
             databaseManager = new DatabaseManager();
             FillUsers();
             FillOrders();
+            FillBlydo();
         }
 
         public void FillOrders()
@@ -79,15 +81,24 @@ namespace SchoolCanteen.Forms.Admin
         {
             if (databaseManager != null)
             {
-                databaseManager.Fill("Dishes", dataGridView1);
+                databaseManager.Fill("Dishes", dataGridView3);
 
                 // Замена названий столбцов на русские
-                dataGridView3.Columns["DishId"].HeaderText = "Номер";
+                dataGridView3.Columns["DishID"].HeaderText = "Номер";
                 dataGridView3.Columns["Name"].HeaderText = "Название";
                 dataGridView3.Columns["Ingredients"].HeaderText = "Ингредиенты";
                 dataGridView3.Columns["Price"].HeaderText = "Цена";
                 dataGridView3.Columns["Quantity"].HeaderText = "Количество";
                 dataGridView3.Columns["Weight"].HeaderText = "Вес";
+
+                dataGridView3.Columns[0].Width = 50;
+                dataGridView3.Columns[1].Width = 150;
+
+                dataGridView3.Columns[2].Width = 200;
+                dataGridView3.Columns[3].Width = 80;
+                dataGridView3.Columns[4].Width = 50;
+                dataGridView3.Columns[5].Width = 80;
+
             }
         }
 
@@ -238,6 +249,17 @@ namespace SchoolCanteen.Forms.Admin
 
         private void button2_Click(object sender, EventArgs e)
         {
+            if (dataGridView3.SelectedRows.Count > 0 && dataGridView3.SelectedRows[0].Cells[0].Value != null)
+            {
+                if (int.TryParse(dataGridView3.SelectedRows[0].Cells[0].Value.ToString(), out int dishId))
+                {
+                    new UpdateDishesForm(this, dishId).ShowDialog();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите блюдо для редактирования.");
+            }
 
         }
 
@@ -282,5 +304,30 @@ namespace SchoolCanteen.Forms.Admin
         {
             FillDetailsOrder();
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0 && dataGridView1.SelectedRows[0].Cells[0].Value != null)
+            {
+                if (int.TryParse(dataGridView1.SelectedRows[0].Cells[0].Value.ToString(), out int userId))
+                {
+                    new UpdateEmployeeForm(this, userId).ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("Некорректный формат номера");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите сотрудника.");
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            new CreateDishesForm(this).ShowDialog();
+        }
+
     }
 }

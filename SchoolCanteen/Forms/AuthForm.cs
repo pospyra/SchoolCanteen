@@ -23,57 +23,54 @@ namespace SchoolCanteen.Forms
             var login = textBox1.Text;
             var pass = textBox2.Text;
 
-
             var role = GetUserRole(login, pass);
             if (role != null)
             {
                 switch (role)
                 {
                     case "admin":
-                        // Открываем форму для кассира
                         new AdminPanelForm().Show();
                         break;
                     case "cashier":
-                        // Открываем форму для кассира
                         new CashierPanelForm().Show();
                         break;
                     case "cook":
-                        // Открываем форму для повара
                         new OrdersForm().Show();
                         break;
                     case "head_cook":
-                        //!!!!!!! Открываем форму для главного повара
-                       // new Forms.HeadCookPanel().Show();
+                        // Добавьте обработку для главного повара
                         break;
                     default:
-                        // Открываем общую форму для остальных ролей
+                        // Добавьте обработку для остальных ролей
                         break;
                 }
                 Hide();
             }
             else
             {
-                MessageBox.Show("Ошибка авторизации");
+                MessageBox.Show("Неправильный логин или пароль", "Ошибка авторизации", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+
         public string GetUserRole(string username, string password)
         {
-            string query = "SELECT RoleName FROM Users " +
+            string query = "SELECT UserID, RoleName FROM Users " +
                            "INNER JOIN Roles ON Users.RoleID = Roles.RoleID " +
                            "WHERE Login = @Username AND Password = @Password";
 
             SqlParameter[] parameters =
             {
-                 new SqlParameter("@Username", username),
-                 new SqlParameter("@Password", password)
-    };
+                new SqlParameter("@Username", username),
+                new SqlParameter("@Password", password)
+            };
 
             DataTable result = databaseManager.GetData(query, parameters);
 
             // Проверяем результат выполнения запроса
             if (result != null && result.Rows.Count > 0)
             {
+                DataStorage.CurrentUserId = Convert.ToInt32(result.Rows[0]["UserID"]);
                 return result.Rows[0]["RoleName"].ToString();
             }
             else

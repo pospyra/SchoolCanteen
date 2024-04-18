@@ -40,6 +40,7 @@ namespace SchoolCanteen.Forms.Cashier
             }
 
             SaveOrderDetailsToDatabase();
+
             cashierPanelForm.FillOrders();
             Hide();
         }
@@ -63,7 +64,7 @@ namespace SchoolCanteen.Forms.Cashier
 
         private int AddOrderAndGetId()
         {
-            int cashierID = 1;
+            int cashierID = DataStorage.CurrentUserId;
             DateTime orderTime = DateTime.Now; // Получаем текущее время
             bool isPaymentByCard = checkBox1.Checked;
             // Формируем SQL-запрос на добавление заказа в таблицу Orders
@@ -113,13 +114,15 @@ namespace SchoolCanteen.Forms.Cashier
                         // Создаем параметры для передачи значений в SQL-запрос
                         SqlParameter[] detailParameters =
                         {
-                        new SqlParameter("@OrderID", orderId),
-                        new SqlParameter("@DishID", dishId),
-                        new SqlParameter("@Quantity", quantity)
-                    };
+                            new SqlParameter("@OrderID", orderId),
+                            new SqlParameter("@DishID", dishId),
+                            new SqlParameter("@Quantity", quantity)
+                        };
 
                         // Выполняем SQL-запрос
                         databaseManager.ExecuteCommand(insertOrderDetailQuery, detailParameters);
+
+                        UpdateDishQuantity(dishId, quantity);
                     }
                 }
 
@@ -198,8 +201,21 @@ namespace SchoolCanteen.Forms.Cashier
         {
             if (dataGridView2.SelectedRows.Count > 0)
             {
-                dataGridView2.Rows.RemoveAt(dataGridView2.SelectedRows[0].Index);
-                CalculateTotalAmount();
+                int selectedIndex = dataGridView2.SelectedRows[0].Index;
+
+                if (selectedIndex != -1 && !dataGridView2.Rows[selectedIndex].IsNewRow)
+                {
+                    dataGridView2.Rows.RemoveAt(selectedIndex);
+                    CalculateTotalAmount();
+                }
+                else
+                {
+                    MessageBox.Show("Выберите строку заказа для удаления.", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите строку заказа для удаления.", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -224,5 +240,30 @@ namespace SchoolCanteen.Forms.Cashier
         {
             CalculateTotalAmount();
         }
+        private void UpdateDishQuantity(string dishId, int orderedQuantity)
+        {
+            try
+            {
+                // Формируем SQL-запрос на обновление количества блюд
+                string updateQuery = @"UPDATE Dishes
+                               SET Quantity = Quantity - @OrderedQuantity
+                               WHERE DishID = @DishID";
+
+                // Создаем параметры для передачи значений в SQL-запрос
+                SqlParameter[] parameters =
+                {
+                    new SqlParameter("@OrderedQuantity", orderedQuantity),
+                    new SqlParameter("@DishID", dishId)
+                };
+
+                // Выполняем SQL-запрос
+                databaseManager.ExecuteCommand(updateQuery, parameters);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при обновлении количества блюд: " + ex.Message);
+            }
+        }
+
     }
 }
